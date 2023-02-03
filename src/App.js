@@ -1,23 +1,27 @@
-import logo from './logo.svg';
 import './App.css';
+import CalculatorView from './component/calculator';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <div className='row'>
+
+        <div className='col-lg-2'>
+
+        </div>
+
+        <div className='col-lg-8'>
+          <br />
+
+          <p className='display-1' align="center">
+            Wolt Delivery Calculator
+          </p>
+          <hr />
+
+          <CalculatorView />
+        </div>
+        <div className='col-lg-2'> </div>
+      </div>
     </div>
   );
 }
