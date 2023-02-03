@@ -3,6 +3,11 @@ import React from "react";
 
 class CalculatorView extends React.Component {
 
+    componentDidMount() {
+        let currentDate = new Date().toISOString().slice(0, -8); //yyyy-MM-ddThh:mm
+        document.querySelector("#datetimepicker").value = currentDate;
+    }
+
     render() {
         return (
             <form>
