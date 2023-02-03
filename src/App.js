@@ -12,14 +12,14 @@ function App() {
 
         <div className='col-lg-8'>
           <br />
-
           <p className='display-1' align="center">
             Wolt Delivery Calculator
           </p>
           <hr />
-
           <CalculatorView />
+          
         </div>
+
         <div className='col-lg-2'> </div>
       </div>
     </div>
