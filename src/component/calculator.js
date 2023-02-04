@@ -123,10 +123,16 @@ class CalculatorView extends React.Component {
                             id="datetimepicker"
                             name="order_time"
                             value={this.state.currentDate}
+                            onChange={(date) => {
+                                console.log(date.target.value);
+                                this.setState({
+                                    currentDate: date.target.value,
+                                });
+                            }}
                             required
                         />
                     </div>
-                    <button type="submit" class="btn btn-success wolt_calc">
+                    <button type="submit" className="btn btn-success wolt_calc">
                         Calculate Delivery Price
                     </button>
                 </form>

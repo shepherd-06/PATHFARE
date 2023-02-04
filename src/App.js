@@ -17,7 +17,7 @@ function App() {
           </p>
           <hr />
           <CalculatorView />
-          
+
         </div>
 
         <div className='col-lg-2'> </div>

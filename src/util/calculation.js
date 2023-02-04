@@ -32,7 +32,6 @@ export const MainCalculation = (total_price, total_items,
     delivery_charge += surcharge
 
     if (order_time.getDay() === 5) {
-        console.log(order_time.getDay());
         if (15 <= order_time.getUTCHours() <= 19) {
             delivery_charge = delivery_charge * 1.2;
             console.log("Friday Rush! ", delivery_charge);

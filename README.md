@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+# Wolt Delivery Calculator App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a front-end implementation for [Wolt Enginnering Summer Intern, 2023](https://github.com/woltapp/engineering-summer-intern-2023). A front-end implementation will be available [here on this Netlify Page].
+
+This project can be implemented and tested locally by following the scripts below, nothing changed from the original recipe.
 
 ## Available Scripts
 
