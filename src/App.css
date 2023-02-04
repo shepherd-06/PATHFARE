@@ -41,6 +41,7 @@
 .wolt_calc {
   padding-top: 1%;
   padding-bottom: 1%;
+  margin-bottom: 2%;
 }
 
 .label_time {
@@ -71,4 +72,5 @@ button {
   padding-top: 1%;
   padding-bottom: 1%;
   display: block;
+  border: 1px solid rgba(121, 240, 133, 0.693);
 }

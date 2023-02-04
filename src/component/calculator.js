@@ -10,14 +10,8 @@ class CalculatorView extends React.Component {
             is_error: false,
             error_message: null,
             delivery_price: null,
+            currentDate: new Date().toISOString().slice(0, -8) //yyyy-MM-ddThh:mm
         };
-    }
-
-
-    componentDidMount() {
-        // set current time on the datetimepicker after loading the components.
-        let currentDate = new Date().toISOString().slice(0, -8); //yyyy-MM-ddThh:mm
-        document.querySelector("#datetimepicker").value = currentDate;
     }
 
     handleSubmit(event) {
@@ -70,7 +64,45 @@ class CalculatorView extends React.Component {
             return;
         }
 
-        
+        if (total_price >= 100) {
+            this.setState({
+                delivery_price: 0,
+            });
+        } else {
+            // do other calculations here
+
+            // price surcharge
+            let surcharge = 0;
+            let delivery_charge = 2;
+
+            if (total_price < 10.0) {
+                surcharge = 10.0 - total_price;
+            }
+
+            if (total_items > 4) {
+                // 50 cent for higher than 4 items.
+                surcharge += (total_items - 4) * 0.50;
+                if (total_items > 12) {
+                    // bulk fee
+                    surcharge += 1.20;
+                }
+            }
+
+            if (delivery_distance > 1000) {
+                delivery_distance -= 1000;
+                delivery_charge += (Math.ceil(delivery_distance / 50) * 1);
+            }
+
+            console.log("delivery charge ", delivery_charge, " surcharge ", surcharge);
+            delivery_charge += surcharge
+            if (delivery_charge > 15) {
+                delivery_charge = 15;
+            }
+
+            this.setState({
+                delivery_price: delivery_charge,
+            });
+        }
 
         if (!this.state.is_error) {
             event.target.reset();
@@ -116,6 +148,7 @@ class CalculatorView extends React.Component {
                         <input type="datetime-local"
                             id="datetimepicker"
                             name="delivery_time"
+                            value={this.state.currentDate}
                             required
                         />
                     </div>
@@ -125,7 +158,6 @@ class CalculatorView extends React.Component {
                 </form>
 
                 <div className={'row success' + (this.state.delivery_price === null ? '' : ' in')}>
-                    <hr />
                     <p className='display-4'>
                         Delivery Price: {this.state.delivery_price}
                     </p>
