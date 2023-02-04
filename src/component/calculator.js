@@ -19,7 +19,7 @@ class CalculatorView extends React.Component {
         let total_price = event.target.total_price.value;
         let delivery_distance = event.target.delivery_distance.value;
         let total_items = event.target.total_items.value;
-        let delivery_time = event.target.delivery_time.value;
+        let order_time = event.target.order_time.value;
 
         total_price = parseInt(total_price);
         delivery_distance = parseInt(delivery_distance);
@@ -36,7 +36,6 @@ class CalculatorView extends React.Component {
 
         if (!validation(delivery_distance)) {
             // validation error
-            console.log("delivery_distance");
             this.setState({
                 is_error: true,
                 error_message: "Delivery distance has to be a non-zero number",
@@ -46,7 +45,6 @@ class CalculatorView extends React.Component {
 
         if (!validation(total_items)) {
             // validation error
-            console.log("total_items");
             this.setState({
                 is_error: true,
                 error_message: "Number of items has to be a non-zero number",
@@ -56,10 +54,20 @@ class CalculatorView extends React.Component {
 
         if ((total_items - Math.floor(total_items)) !== 0) {
             // validation error; safety
-            console.log("safety");
             this.setState({
                 is_error: true,
                 error_message: "Number of items cannot be a fraction",
+            });
+            return;
+        }
+
+        // date validator
+        // converts ISO String to date obj
+        order_time = new Date(order_time);
+        if (!(order_time instanceof Date) && !isNaN(order_time)) {
+            this.setState({
+                is_error: true,
+                error_message: "Order Time is invalid!",
             });
             return;
         }
@@ -95,6 +103,15 @@ class CalculatorView extends React.Component {
 
             console.log("delivery charge ", delivery_charge, " surcharge ", surcharge);
             delivery_charge += surcharge
+
+            if (order_time.getDay() === 5) {
+                console.log(order_time.getDay());
+                if (15 <= order_time.getUTCHours() <= 19) {
+                    delivery_charge = delivery_charge * 1.2;
+                    console.log("Friday Rush! ", delivery_charge);
+                }
+            }
+
             if (delivery_charge > 15) {
                 delivery_charge = 15;
             }
@@ -144,10 +161,10 @@ class CalculatorView extends React.Component {
                             required />
                     </div>
                     <div className="form-group wolt_calc">
-                        <label className='label_time'>Time : </label>
+                        <label className='label_time'>Order Time : </label>
                         <input type="datetime-local"
                             id="datetimepicker"
-                            name="delivery_time"
+                            name="order_time"
                             value={this.state.currentDate}
                             required
                         />
