@@ -1,6 +1,7 @@
 import '../App.css';
 import React from "react";
 import { validation } from '../util/validation';
+import { MainCalculation } from '../util/calculation';
 
 class CalculatorView extends React.Component {
 
@@ -72,54 +73,10 @@ class CalculatorView extends React.Component {
             return;
         }
 
-        if (total_price >= 100) {
-            this.setState({
-                delivery_price: 0,
-            });
-        } else {
-            // do other calculations here
-
-            // price surcharge
-            let surcharge = 0;
-            let delivery_charge = 2;
-
-            if (total_price < 10.0) {
-                surcharge = 10.0 - total_price;
-            }
-
-            if (total_items > 4) {
-                // 50 cent for higher than 4 items.
-                surcharge += (total_items - 4) * 0.50;
-                if (total_items > 12) {
-                    // bulk fee
-                    surcharge += 1.20;
-                }
-            }
-
-            if (delivery_distance > 1000) {
-                delivery_distance -= 1000;
-                delivery_charge += (Math.ceil(delivery_distance / 50) * 1);
-            }
-
-            console.log("delivery charge ", delivery_charge, " surcharge ", surcharge);
-            delivery_charge += surcharge
-
-            if (order_time.getDay() === 5) {
-                console.log(order_time.getDay());
-                if (15 <= order_time.getUTCHours() <= 19) {
-                    delivery_charge = delivery_charge * 1.2;
-                    console.log("Friday Rush! ", delivery_charge);
-                }
-            }
-
-            if (delivery_charge > 15) {
-                delivery_charge = 15;
-            }
-
-            this.setState({
-                delivery_price: delivery_charge,
-            });
-        }
+        this.setState({
+            delivery_price: MainCalculation(total_price, total_items,
+                delivery_distance, order_time),
+        });
 
         if (!this.state.is_error) {
             event.target.reset();
