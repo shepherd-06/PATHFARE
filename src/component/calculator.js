@@ -100,6 +100,7 @@ class CalculatorView extends React.Component {
                         <input type="number" className="form-control"
                             placeholder="Enter the cart price here (Euro)"
                             name="total_price"
+                            step="any"
                             required />
                     </div>
                     <div className="form-group wolt_calc">
