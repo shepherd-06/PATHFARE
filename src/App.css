@@ -72,5 +72,16 @@ button {
   padding-top: 1%;
   padding-bottom: 1%;
   display: block;
-  border: 1px solid rgba(121, 240, 133, 0.693);
+  border: 1px solid rgba(93, 179, 102, 0.693);
+  border-radius: 1em;
+}
+
+.calculator_view {
+  border: 1px solid cadetblue;
+  border-radius: 10px;
+  padding: 1em;
+}
+
+.form_label {
+  font-size: 1.1em;
 }

@@ -22,7 +22,7 @@ class CalculatorView extends React.Component {
         let total_items = event.target.total_items.value;
         let order_time = event.target.order_time.value;
 
-        total_price = parseInt(total_price);
+        total_price = parseFloat(total_price);
         delivery_distance = parseInt(delivery_distance);
         total_items = parseInt(total_items);
 
@@ -85,7 +85,7 @@ class CalculatorView extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className='calculator_view'>
                 <div className={'row error-control' + (this.state.is_error ? ' in' : '')}>
                     <p className='h4'>
                         Validation Error occurred!
@@ -96,7 +96,7 @@ class CalculatorView extends React.Component {
                 </div>
                 <form onSubmit={this.handleSubmit.bind(this)}>
                     <div className="form-group wolt_calc">
-                        <label>Cart Value</label>
+                        <label className='form_label'>Cart Value</label>
                         <input type="number" className="form-control"
                             placeholder="Enter the cart price here (Euro)"
                             name="total_price"
@@ -104,7 +104,7 @@ class CalculatorView extends React.Component {
                             required />
                     </div>
                     <div className="form-group wolt_calc">
-                        <label>Delivery Distance</label>
+                        <label className='form_label'>Delivery Distance</label>
                         <input type="number" className="form-control"
                             placeholder="delivery distance (m)"
                             name="delivery_distance"
@@ -112,14 +112,14 @@ class CalculatorView extends React.Component {
                     </div>
 
                     <div className="form-group wolt_calc">
-                        <label>Amount of Items</label>
+                        <label className='form_label'>Amount of Items</label>
                         <input type="number" className="form-control"
                             placeholder="number of items in the cart"
                             name="total_items"
                             required />
                     </div>
                     <div className="form-group wolt_calc">
-                        <label className='label_time'>Order Time : </label>
+                        <label className='label_time form_label'>Order Time : </label>
                         <input type="datetime-local"
                             id="datetimepicker"
                             name="order_time"
