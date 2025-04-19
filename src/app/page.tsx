@@ -15,7 +15,7 @@ const steps = [
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [inputValues, setInputValues] = useState({});
+  const [inputValues, setInputValues] = useState<{[key: number]: string}>({});
   const [total, setTotal] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState('slide-in-right');
@@ -110,7 +110,7 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4 max-w-3xl text-center">
-      <h1 className="text-h1 font-bold mb-4 text-display">Pathfare</h1>
+      <h1 className="text-h1 font-bold mb-4 text-primary">Pathfare</h1>
       <h5 className="text-body opacity-70">
         Unlock seamless shipping with Pathfare. Optimize your routes and packaging for cost-effective and timely
         deliveries.
