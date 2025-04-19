@@ -39,6 +39,9 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --text: 172 100% 11%; /* 003B36 */
+    --text-secondary: 267 42% 93%; /* ECE5F0 */
+    --error: 4 90% 55%; /* ED2A1D */
 
     /* Font sizes */
     --font-display: 56px;
@@ -79,6 +82,9 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --text: 0 0% 98%;
+    --text-secondary: 0 0% 14.9%;
+    --error: 4 90% 55%; /* ED2A1D */
   }
 }
 
@@ -90,3 +96,60 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Define font sizes using CSS variables */
+@layer utilities {
+  .text-display {
+    font-size: var(--font-display);
+  }
+  .text-h1 {
+    font-size: var(--font-h1);
+  }
+  .text-h2 {
+    font-size: var(--font-h2);
+  }
+  .text-h3 {
+    font-size: var(--font-h3);
+  }
+  .text-h4 {
+    font-size: var(--font-h4);
+  }
+  .text-body {
+    font-size: var(--font-body);
+  }
+  .text-small {
+    font-size: var(--font-small);
+  }
+}
+
+/* Animation classes */
+.slide-in-right {
+  animation: slideInRight 0.5s forwards;
+}
+
+.slide-out-left {
+  animation: slideOutLeft 0.5s forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
