@@ -21,6 +21,7 @@ interface State {
   showForm: boolean;
   currentDate: Date;
   errors: { [key: number]: string };
+  showModal: boolean;
 }
 
 export default class Home extends Component<{}, State> {
@@ -38,6 +39,7 @@ export default class Home extends Component<{}, State> {
       showForm: true,
       currentDate: new Date(),
       errors: {},
+      showModal: false,
     };
     this.stepRef = createRef();
   }
@@ -245,7 +247,7 @@ export default class Home extends Component<{}, State> {
 
 
   render() {
-    const { currentStep, inputValues, total, showConfetti, transitionDirection, showForm, currentDate, errors } = this.state;
+    const { currentStep, inputValues, total, showModal, transitionDirection, showForm, currentDate, errors } = this.state;
 
     return (
       <div className="container mx-auto p-4 max-w-3xl text-center">
@@ -344,6 +346,8 @@ export default class Home extends Component<{}, State> {
                 </div>
               )}
             </div>
+
+
           </div>
         )}
 
@@ -372,6 +376,43 @@ export default class Home extends Component<{}, State> {
             </button>
           </div>
         )}
+
+        <div className="relative min-h-screen flex flex-col justify-between">
+          <button
+            onClick={() => this.setState({ showModal: true })}
+            className="fixed top-4 right-4 bg-blue-100 text-blue-800 px-3 py-1 rounded-full shadow hover:bg-blue-200"
+          >
+            How will the delivery cost be calculated?
+          </button>
+
+          {showModal && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+              <div className="bg-white rounded-xl p-6 max-w-xl text-left shadow-lg">
+                <h2 className="text-lg font-bold mb-4">How We Calculate Your Delivery Fee</h2>
+                <ul className="text-sm space-y-2 list-disc pl-5">
+                  <li>If your cart total is less than €10, we add just enough to bring it up to €10.</li>
+                  <li>The first 1 km of delivery costs €2. After that, it’s €1 for every extra 500 meters.</li>
+                  <li>Ordering 5 or more items? Each extra item adds €0.50.</li>
+                  <li>If you order more than 12 items, we apply an extra bulk handling fee of €1.20.</li>
+                  <li>Spend €100 or more, and your delivery is completely free!</li>
+                  <li>On Fridays from 3 PM to 7 PM (UTC), delivery fees increase slightly due to high demand.</li>
+                  <li>Don’t worry — your delivery fee will never exceed €15.</li>
+                </ul>
+
+                <div className="text-right mt-4">
+                  <button onClick={() => this.setState({ showModal: false })} className="px-4 py-2 bg-blue-500 text-white rounded">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <footer className="text-center text-xs text-gray-500 mt-8 pb-4">
+            This app is 99% made with Gemini in Firebase Studio and finalized by ChatGPT (GPT-4o).
+          </footer>
+
+        </div>
 
       </div>
     );
