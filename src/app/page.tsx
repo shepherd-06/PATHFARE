@@ -20,6 +20,7 @@ interface State {
   transitionDirection: string;
   showForm: boolean;
   currentDate: Date;
+  errors: { [key: number]: string };
 }
 
 export default class Home extends Component<{}, State> {
@@ -36,15 +37,32 @@ export default class Home extends Component<{}, State> {
       transitionDirection: 'slide-in-right',
       showForm: true,
       currentDate: new Date(),
+      errors: {},
     };
     this.stepRef = createRef();
   }
 
+  getNextHourDate = () => {
+    const now = new Date();
+    now.setTime(now.getTime() + 60 * 60 * 1000); // add 60 minutes
+    return now;
+  };
+
+
   componentDidMount() {
+    const nextHour = this.getNextHourDate();
+    this.setState({
+      currentDate: nextHour,
+      inputValues: {
+        4: `${nextHour.toISOString().split('T')[0]} ${nextHour.toTimeString().slice(0, 5)}`
+      }
+    });
+
     this.intervalId = setInterval(() => {
       this.setState({ currentDate: new Date() });
     }, 1000);
   }
+  
 
   componentDidUpdate(_prevProps: {}, prevState: State) {
     if (this.state.transitionDirection !== '' && prevState.transitionDirection !== this.state.transitionDirection) {
@@ -59,21 +77,60 @@ export default class Home extends Component<{}, State> {
   }
 
   handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { currentStep, inputValues } = this.state;
+    const { currentStep, inputValues, errors } = this.state;
     const value = e.target.value;
 
+    let valid = false;
     if (currentStep !== 3) {
-      if (/^\d*\.?\d*$/.test(value)) {
-        this.setState({ inputValues: { ...inputValues, [currentStep]: value } });
-      }
+      valid = /^\d*\.?\d*$/.test(value);
     } else {
-      if (/^\d+$/.test(value)) {
-        this.setState({ inputValues: { ...inputValues, [currentStep]: value } });
-      }
+      valid = /^\d+$/.test(value);
+    }
+
+    if (valid) {
+      this.setState({
+        inputValues: { ...inputValues, [currentStep]: value },
+        errors: { ...errors, [currentStep]: '' },
+      });
     }
   };
 
+  validateStep = () => {
+    const { currentStep, inputValues, errors } = this.state;
+  
+    if (currentStep === 4) {
+      const value = inputValues[4];
+      const [dateStr, timeStr] = value?.split(' ') || [];
+  
+      if (!dateStr || !timeStr) {
+        this.setState({ errors: { ...errors, [4]: 'Please select both date and time.' } });
+        return false;
+      }
+  
+      const selected = new Date(`${dateStr}T${timeStr}`);
+      const now = new Date();
+  
+      if (isNaN(selected.getTime()) || selected < now) {
+        this.setState({ errors: { ...errors, [4]: 'Delivery time cannot be in the past.' } });
+        return false;
+      }
+  
+      return true;
+    }
+  
+    const currentValue = inputValues[currentStep];
+    if (!currentValue || currentValue.trim() === '') {
+      this.setState({ errors: { ...errors, [currentStep]: 'This field is required.' } });
+      return false;
+    }
+  
+    return true;
+  };
+  
+
   handleNext = () => {
+    if (!this.validateStep()) return;
+
     const { currentStep, inputValues } = this.state;
     if (currentStep < steps.length) {
       this.setState({
@@ -127,8 +184,24 @@ export default class Home extends Component<{}, State> {
     });
   };
 
+  resetToNextHour = () => {
+    const nextHour = this.getNextHourDate();
+    this.setState({
+      currentStep: 1,
+      inputValues: {
+        4: `${nextHour.toISOString().split('T')[0]} ${nextHour.toTimeString().slice(0, 5)}`
+      },
+      total: null,
+      showConfetti: false,
+      transitionDirection: 'slide-in-right',
+      showForm: true,
+      errors: {},
+      currentDate: nextHour,
+    });
+  };
+
   render() {
-    const { currentStep, inputValues, total, showConfetti, transitionDirection, showForm, currentDate } = this.state;
+    const { currentStep, inputValues, total, showConfetti, transitionDirection, showForm, currentDate, errors } = this.state;
 
     return (
       <div className="container mx-auto p-4 max-w-3xl text-center">
@@ -159,13 +232,15 @@ export default class Home extends Component<{}, State> {
                         <label className="block text-sm font-medium text-gray-700">Select Date</label>
                         <input
                           type="date"
-                          defaultValue={this.state.currentDate.toISOString().split('T')[0]} // 'YYYY-MM-DD'
+                          min={this.state.currentDate.toISOString().split('T')[0]}
+                          defaultValue={this.state.currentDate.toISOString().split('T')[0]}
                           onChange={(e) =>
                             this.setState({
                               inputValues: {
                                 ...inputValues,
                                 [4]: `${e.target.value} ${inputValues[4]?.split(' ')[1] || this.formatTime(currentDate)}`
-                              }
+                              },
+                              errors: { ...errors, [4]: '' }
                             })
                           }
                           className="rounded-md p-2 border mt-1 text-center"
@@ -175,53 +250,51 @@ export default class Home extends Component<{}, State> {
                         <label className="block text-sm font-medium text-gray-700">Select Time</label>
                         <input
                           type="time"
-                          defaultValue={this.state.currentDate.toTimeString().slice(0, 5)} // 'HH:MM'
+                          min={this.state.currentDate.toTimeString().slice(0, 5)}
                           onChange={(e) =>
                             this.setState({
                               inputValues: {
                                 ...inputValues,
                                 [4]: `${inputValues[4]?.split(' ')[0] || this.state.currentDate.toISOString().split('T')[0]} ${e.target.value}`
-                              }
+                              },
+                              errors: { ...errors, [4]: '' }
                             })
                           }
                           className="rounded-md p-2 border mt-1 text-center"
                         />
                       </div>
+                      {errors[4] && <p className="text-red-600 text-sm mt-2">{errors[4]}</p>}
                     </div>
                   ) : (
-                    <Input
-                      type={steps[currentStep - 1].type}
-                      placeholder={steps[currentStep - 1].label}
-                      onChange={this.handleInputChange}
-                      value={inputValues[currentStep] || ''}
-                      className="rounded-full bg-secondary/50 text-center mx-auto w-64"
-                      required
-                    />
+                    <div>
+                      <Input
+                        type={steps[currentStep - 1].type}
+                        placeholder={steps[currentStep - 1].label}
+                        onChange={this.handleInputChange}
+                        value={inputValues[currentStep] || ''}
+                        className="rounded-full bg-secondary/50 text-center mx-auto w-64"
+                        required
+                      />
+                      {errors[currentStep] && <p className="text-red-600 text-sm mt-1">{errors[currentStep]}</p>}
+                    </div>
                   )}
 
-
-                  <div className="flex justify-center gap-8 mt-4">
+                  <div className="flex justify-center gap-8 mt-8">
                     {currentStep > 1 && (
-                      <Button onClick={this.handlePrevious} style={{
-                        borderRadius: "10px",
-                        color: "#003B36",
-                        border: "1px dashed #1E91D6",
-                        paddingLeft: "10px",
-                        paddingRight: "10px"
-                      }}>
+                      <button
+                        onClick={this.handlePrevious}
+                        className="px-6 py-3 rounded-lg border border-blue-500 text-blue-900 hover:bg-blue-50 shadow-md"
+                      >
                         Previous
-                      </Button>
+                      </button>
                     )}
                     {currentStep <= steps.length && (
-                      <Button onClick={this.handleNext} style={{
-                        background: "#1E91D6",
-                        borderRadius: "10px",
-                        color: "#ECE5F0",
-                        paddingLeft: "10px",
-                        paddingRight: "10px"
-                      }}>
-                        {currentStep === steps.length ? 'Calculate Total' : 'Next >>'}
-                      </Button>
+                      <button
+                        onClick={this.handleNext}
+                        className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 shadow-md"
+                      >
+                        {currentStep === steps.length ? 'Calculate' : 'Next >>'}
+                      </button>
                     )}
                   </div>
                 </div>
@@ -231,15 +304,31 @@ export default class Home extends Component<{}, State> {
         )}
 
         {!showForm && total !== null && (
-          <div className="mt-12">
-            <div className="text-4xl font-bold mt-6 text-primary">Total: €{total.toFixed(2)}</div>
-            {Object.entries(inputValues).map(([step, value]) => (
-              <div key={step} className="mt-2">
-                Step {step}: {value}
-              </div>
-            ))}
+          <div className="mt-12 text-center">
+            <div className="text-3xl font-semibold text-text mb-6">
+              Your Total is <span className="text-primary text-5xl font-bold">€{total.toFixed(2)}</span>
+            </div>
+            <p className="text-lg text-text mb-2">
+              You have <span className="text-primary font-medium">{inputValues[3]}</span> items in your cart,
+              totaling <span className="text-primary font-medium">€{inputValues[1]}</span>.
+            </p>
+            <p className="text-lg text-text mb-2">
+              It will be delivered at <span className="text-primary font-medium">{inputValues[4]?.split(' ')[1]}</span>
+              on <span className="text-primary font-medium">{this.formatDate(new Date(inputValues[4]?.split(' ')[0]))}</span>.
+            </p>
+            <p className="text-lg text-text mb-6">
+              Delivery distance is <span className="text-primary font-medium">{inputValues[2]}</span> meters.
+            </p>
+
+            <button
+              className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white text-xl rounded-xl shadow-md"
+              onClick={this.resetToNextHour}
+            >
+              START AGAIN
+            </button>
           </div>
         )}
+
       </div>
     );
   }
