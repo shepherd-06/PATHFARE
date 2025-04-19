@@ -4,11 +4,9 @@
 @tailwind utilities;
 
 body {
-  font-family: Albert Sans, sans;
-}
-
-h1 {
-  font-family: Bona Nova SC;
+  font-family: Albert Sans;
+  color: #003B36;
+  background: #EFF8E2;
 }
 
 @layer base {
@@ -86,7 +84,7 @@ h1 {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --text: 0 0% 98%;
+    --text: #003B36;
     --text-secondary: 0 0% 14.9%;
     --error: #ED2A1D; /* ED2A1D */
   }
@@ -105,24 +103,33 @@ h1 {
 @layer utilities {
   .text-display {
     font-size: var(--font-display);
+    font-family: Bona Nova SC;
+    color: #1E91D6;
   }
   .text-h1 {
     font-size: var(--font-h1);
+    font-family: Bona Nova SC;
+    color: #1E91D6;
   }
   .text-h2 {
     font-size: var(--font-h2);
+    font-family: Albert Sans;
   }
   .text-h3 {
     font-size: var(--font-h3);
+    font-family: Albert Sans;
   }
   .text-h4 {
     font-size: var(--font-h4);
+    font-family: Albert Sans;
   }
   .text-body {
     font-size: var(--font-body);
+    font-family: Albert Sans;
   }
   .text-small {
     font-size: var(--font-small);
+    font-family: Albert Sans;
   }
 }
 

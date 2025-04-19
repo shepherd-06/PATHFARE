@@ -1,15 +1,14 @@
 'use client';
 
 import React, { Component, createRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 const steps = [
-  { id: 1, label: 'Price in Euro', type: 'number', suffix: '€' },
-  { id: 2, label: 'Distance in Meter', type: 'number', suffix: 'm' },
-  { id: 3, label: 'Number of Items', type: 'number', suffix: 'items' },
-  { id: 4, label: 'Delivery Time and Date', type: 'date', type2: 'time' },
+  { id: 1, label: 'How much is your order worth?', type: 'number', suffix: '€', placeholder: 'Cart Value' },
+  { id: 2, label: 'How far is the delivery destination?', type: 'number', suffix: 'm', placeholder: 'Delivery Distance' },
+  { id: 3, label: 'How many items are you ordering?', type: 'number', suffix: 'items', placeholder: 'Number of Items' },
+  { id: 4, label: 'When would you like your delivery to arrive?', type: 'date', type2: 'time' },
 ];
 
 interface State {
@@ -37,7 +36,7 @@ export default class Home extends Component<{}, State> {
       showConfetti: false,
       transitionDirection: 'slide-in-right',
       showForm: true,
-      currentDate: new Date(),
+      currentDate: this.getNextHourDate(),
       errors: {},
       showModal: false,
     };
@@ -248,21 +247,23 @@ export default class Home extends Component<{}, State> {
 
   render() {
     const { currentStep, inputValues, total, showModal, transitionDirection, showForm, currentDate, errors } = this.state;
-
     return (
       <div className="container mx-auto p-4 max-w-3xl text-center">
-        <h1 className="text-h1 font-bold mb-4 text-primary" style={{ fontFamily: 'Bona Nova SC' }}>PATHFARE</h1>
-        <h5 className="text-body opacity-70">
+        <h1 className="text-display mb-4 text-primary"
+          style={{ fontFamily: 'Bona Nova SC', color: "#1E91D6" }}>PATHFARE</h1>
+        <h5 className="text-small opacity-70">
           Unlock seamless shipping with Pathfare. Optimize your routes and packaging for cost-effective and timely deliveries.
         </h5>
 
         {showForm && (
-          <div className="mt-12 border border-border rounded-xl pt-5 pb-5">
+          <div className="mt-12 border border-border rounded-xl pt-5 pb-5" style={{
+            borderColor: "#1E91D6"
+          }}>
             <div className="mb-4 text-text">
               {currentStep < steps.length ? (
-                <span className="text-small">Step <span className="text-h2">{currentStep}</span> / {steps.length}</span>
+                <span className="text-h3">Step <span className="text-h1">{currentStep}</span> / {steps.length}</span>
               ) : (
-                <span className="text-h4">Total</span>
+                <span className="text-h3">Total</span>
               )}
             </div>
 
@@ -270,7 +271,7 @@ export default class Home extends Component<{}, State> {
               {currentStep <= steps.length && (
                 <div key={currentStep} className="mb-6 p-4">
                   <div className="mb-2 text-text">
-                    <h4 className="text-h4">{steps[currentStep - 1].label}</h4>
+                    <h4 className="text-body">{steps[currentStep - 1].label}</h4>
                   </div>
                   {currentStep === 4 ? (
                     <div className="text-center">
@@ -307,6 +308,7 @@ export default class Home extends Component<{}, State> {
                             })
                           }
                           className="rounded-md p-2 border mt-1 text-center"
+
                         />
                       </div>
                       {errors[4] && <p className="text-red-600 text-sm mt-2">{errors[4]}</p>}
@@ -315,11 +317,13 @@ export default class Home extends Component<{}, State> {
                     <div>
                       <Input
                         type={steps[currentStep - 1].type}
-                        placeholder={steps[currentStep - 1].label}
+                        placeholder={steps[currentStep - 1].placeholder}
                         onChange={this.handleInputChange}
                         value={inputValues[currentStep] || ''}
-                        className="rounded-full bg-secondary/50 text-center mx-auto w-64"
-                        required
+                        className="rounded-full bg-secondary/50 text-center mx-auto w-72 h-50 text-small"
+                        style={{
+                          background: "#ECE5F0"
+                        }}
                       />
                       {errors[currentStep] && <p className="text-red-600 text-sm mt-1">{errors[currentStep]}</p>}
                     </div>
@@ -329,17 +333,23 @@ export default class Home extends Component<{}, State> {
                     {currentStep > 1 && (
                       <button
                         onClick={this.handlePrevious}
-                        className="px-6 py-3 rounded-lg border border-blue-500 text-blue-900 hover:bg-blue-50 shadow-md"
+                        className="px-6 py-3 rounded-lg border shadow-sm"
+                        style={{
+                          border: "1px groove #1E91D6",
+                        }}
                       >
-                        Previous
+                        PREVIOUS
                       </button>
                     )}
                     {currentStep <= steps.length && (
                       <button
                         onClick={this.handleNext}
-                        className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 shadow-md"
+                        className="px-6 py-3 rounded-lg shadow-md" style={{
+                          background: "#1E91D6",
+                          color: "#EFF8E2"
+                        }}
                       >
-                        {currentStep === steps.length ? 'Calculate' : 'Next >>'}
+                        {currentStep === steps.length ? "CALCULATE" : 'NEXT'}
                       </button>
                     )}
                   </div>
@@ -352,24 +362,40 @@ export default class Home extends Component<{}, State> {
         )}
 
         {!showForm && total !== null && (
-          <div className="mt-12 text-center">
-            <div className="text-3xl font-semibold text-text mb-6">
-              Your Total is <span className="text-primary text-5xl font-bold">€{total.toFixed(2)}</span>
+          <div className="mt-12 text-center border" style={{
+            borderColor: "#1E91D6"
+          }}>
+            <div className="text-3xl text-text mb-6">
+              Your Total is <span className="text-primary text-5xl font-bold text-h1">€{total.toFixed(2)}</span>
             </div>
-            <p className="text-lg text-text mb-2">
-              You have <span className="text-primary font-medium">{inputValues[3]}</span> items in your cart,
-              totaling <span className="text-primary font-medium">€{inputValues[1]}</span>.
+            <p className="text-body mb-2">
+              You have <span className="text-primary font-bold" style={{
+                color: "#9D44B5"
+              }}>{inputValues[3]}</span> items in your cart,
+              totaling <span className="text-primary  font-bold" style={{
+                color: "#9D44B5"
+              }}>€{inputValues[1]}</span>.
             </p>
-            <p className="text-lg text-text mb-2">
-              It will be delivered at <span className="text-primary font-medium">{inputValues[4]?.split(' ')[1]}</span>
-              {" "} on  <span className="text-primary font-medium">{this.formatDate(new Date(inputValues[4]?.split(' ')[0]))}</span>.
+            <p className="text-body mb-2">
+              It will be delivered at <span className="text-primary font-bold" style={{
+                color: "#9D44B5"
+              }}>{inputValues[4]?.split(' ')[1]}</span>
+              {" "} on  <span className="text-primary  font-bold" style={{
+                color: "#9D44B5"
+              }}>{this.formatDate(new Date(inputValues[4]?.split(' ')[0]))}</span>.
             </p>
-            <p className="text-lg text-text mb-6">
-              Delivery distance is <span className="text-primary font-medium">{inputValues[2]}</span> meters.
+            <p className="text-body mb-6">
+              Delivery distance is <span className="text-primary  font-bold" style={{
+                color: "#9D44B5"
+              }}>{inputValues[2]}</span> meters.
             </p>
 
             <button
-              className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white text-xl rounded-xl shadow-md"
+              className="px-8 py-4 rounded-xl shadow-sm"
+              style={{
+                background: "#1E91D6",
+                color: "#EFF8E2"
+              }}
               onClick={this.resetToNextHour}
             >
               START AGAIN
@@ -400,7 +426,10 @@ export default class Home extends Component<{}, State> {
                 </ul>
 
                 <div className="text-right mt-4">
-                  <button onClick={() => this.setState({ showModal: false })} className="px-4 py-2 bg-blue-500 text-white rounded">
+                  <button onClick={() => this.setState({ showModal: false })} className="px-4 py-2 rounded" style={{
+                    background: "#1E91D6",
+                    color: "#EFF8E2"
+                  }}>
                     Close
                   </button>
                 </div>
