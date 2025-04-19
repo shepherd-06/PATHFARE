@@ -62,7 +62,7 @@ export default class Home extends Component<{}, State> {
       this.setState({ currentDate: new Date() });
     }, 1000);
   }
-  
+
 
   componentDidUpdate(_prevProps: {}, prevState: State) {
     if (this.state.transitionDirection !== '' && prevState.transitionDirection !== this.state.transitionDirection) {
@@ -97,36 +97,36 @@ export default class Home extends Component<{}, State> {
 
   validateStep = () => {
     const { currentStep, inputValues, errors } = this.state;
-  
+
     if (currentStep === 4) {
       const value = inputValues[4];
       const [dateStr, timeStr] = value?.split(' ') || [];
-  
+
       if (!dateStr || !timeStr) {
         this.setState({ errors: { ...errors, [4]: 'Please select both date and time.' } });
         return false;
       }
-  
+
       const selected = new Date(`${dateStr}T${timeStr}`);
       const now = new Date();
-  
+
       if (isNaN(selected.getTime()) || selected < now) {
         this.setState({ errors: { ...errors, [4]: 'Delivery time cannot be in the past.' } });
         return false;
       }
-  
+
       return true;
     }
-  
+
     const currentValue = inputValues[currentStep];
     if (!currentValue || currentValue.trim() === '') {
       this.setState({ errors: { ...errors, [currentStep]: 'This field is required.' } });
       return false;
     }
-  
+
     return true;
   };
-  
+
 
   handleNext = () => {
     if (!this.validateStep()) return;
@@ -138,10 +138,7 @@ export default class Home extends Component<{}, State> {
         currentStep: currentStep + 1,
       });
     } else {
-      let calculatedTotal = 0;
-      Object.values(inputValues).forEach(value => {
-        calculatedTotal += parseFloat(value || '0');
-      });
+      let calculatedTotal = this.calculateDeliveryFee();
       this.setState({ showConfetti: true, showForm: false }, () => {
         this.animateTotal(calculatedTotal);
       });
@@ -199,6 +196,53 @@ export default class Home extends Component<{}, State> {
       currentDate: nextHour,
     });
   };
+
+  calculateDeliveryFee = (): number => {
+    const cartValue = parseFloat(this.state.inputValues[1] || '0');
+    const distance = parseInt(this.state.inputValues[2] || '0');
+    const items = parseInt(this.state.inputValues[3] || '0');
+    const [dateStr, timeStr] = (this.state.inputValues[4] || '').split(' ');
+    const deliveryDate = new Date(`${dateStr}T${timeStr}`);
+
+    let total = 0;
+
+    // Rule 1: Small order surcharge if cart value < 10€
+    if (cartValue < 10) {
+      total += 10 - cartValue;
+    }
+
+    // Rule 2: Distance fee
+    total += 2; // base fee for first 1000m
+    if (distance > 1000) {
+      const extraDistance = distance - 1000;
+      total += Math.ceil(extraDistance / 500); // 1€ per additional 500m
+    }
+
+    // Rule 3: Item-based surcharge
+    if (items >= 5) {
+      total += (items - 4) * 0.5; // 0.5€ per item from 5th onward
+    }
+    if (items > 12) {
+      total += 1.2; // bulk fee
+    }
+
+    // Rule 4: Free delivery if cart value >= 100€
+    if (cartValue >= 100) {
+      return 0;
+    }
+
+    // Rule 5: Friday rush (3–7 PM UTC)
+    const isFriday = deliveryDate.getUTCDay() === 5;
+    const hourUTC = deliveryDate.getUTCHours();
+    const isRushHour = hourUTC >= 15 && hourUTC < 19;
+    if (isFriday && isRushHour) {
+      total *= 1.2;
+    }
+
+    // Rule 6: Cap max delivery fee at 15€
+    return Math.min(15, parseFloat(total.toFixed(2)));
+  };
+
 
   render() {
     const { currentStep, inputValues, total, showConfetti, transitionDirection, showForm, currentDate, errors } = this.state;
@@ -314,7 +358,7 @@ export default class Home extends Component<{}, State> {
             </p>
             <p className="text-lg text-text mb-2">
               It will be delivered at <span className="text-primary font-medium">{inputValues[4]?.split(' ')[1]}</span>
-              on <span className="text-primary font-medium">{this.formatDate(new Date(inputValues[4]?.split(' ')[0]))}</span>.
+              {" "} on  <span className="text-primary font-medium">{this.formatDate(new Date(inputValues[4]?.split(' ')[0]))}</span>.
             </p>
             <p className="text-lg text-text mb-6">
               Delivery distance is <span className="text-primary font-medium">{inputValues[2]}</span> meters.
