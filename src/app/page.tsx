@@ -79,7 +79,7 @@ export default function Home() {
     if (transitionDirection) {
       const timer = setTimeout(() => {
         setTransitionDirection('');
-      }, 500); // Match the animation duration
+      }, 1000); // Match the animation duration
       return () => clearTimeout(timer);
     }
   }, [currentStep]);
@@ -110,18 +110,20 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4 max-w-3xl text-center">
-      <h1 className="text-h1 font-bold mb-4 text-primary">Pathfare</h1>
-      <h3 className="text-h3 opacity-70">
+      <h1 className="text-h1 font-bold mb-4 text-display">Pathfare</h1>
+      <h5 className="text-body opacity-70">
         Unlock seamless shipping with Pathfare. Optimize your routes and packaging for cost-effective and timely
         deliveries.
-      </h3>
+      </h5>
 
       {showForm && (
-        <div className="mt-12">
+        <div className="mt-12 border border-border rounded-xl" style={{
+          paddingTop: "20px", paddingBottom: "20px"
+        }}>
           <div className="mb-4 text-text">
             {currentStep < steps.length ? (
-              <text className="text-h4">
-                Step {currentStep}/{steps.length}
+              <text className="text-small">
+                Step <span className="text-h3"> {currentStep} </span> / {steps.length}
               </text>
             ) : (
               <text className="text-h4">Final Step</text>
@@ -133,7 +135,7 @@ export default function Home() {
             className={cn("transition-transform duration-500", transitionDirection)}
           >
             {currentStep <= steps.length && (
-              <div key={currentStep} className="mb-6 p-4 border border-border rounded-xl">
+              <div key={currentStep} className="mb-6 p-4">
                 <div className="mb-2 text-text">
                   <h4 className="text-h4">{steps[currentStep - 1].label}</h4>
                 </div>
@@ -162,7 +164,7 @@ export default function Home() {
           )}
           {currentStep <= steps.length ? (
             <Button onClick={handleNext}>
-              {currentStep === steps.length ? 'Calculate Total' : 'Next'}
+              {currentStep === steps.length ? 'Calculate Total' : 'Next '}
               &gt;&gt;
             </Button>
           ) : null}
