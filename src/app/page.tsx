@@ -24,7 +24,18 @@ export default function Home() {
   const stepRef = useRef(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValues({...inputValues, [currentStep]: e.target.value});
+    const value = e.target.value;
+    if (currentStep !== 3) {
+      // For price and distance, allow only positive numbers
+      if (/^\d*\.?\d*$/.test(value)) {
+        setInputValues({...inputValues, [currentStep]: value});
+      }
+    } else {
+      // For number of items, allow only positive integers
+      if (/^\d+$/.test(value)) {
+        setInputValues({...inputValues, [currentStep]: value});
+      }
+    }
   };
 
   const handleNext = () => {
