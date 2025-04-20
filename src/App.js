@@ -168,11 +168,13 @@ export default class App extends Component {
 
   animateTotal = (finalTotal) => {
     let start = 0;
-    const duration = 2000;
+    const duration = 3000;
     const step = (timestamp) => {
       if (!start) start = timestamp;
       const progress = Math.min((timestamp - start) / duration, 1);
-      this.setState({ total: Math.floor(progress * finalTotal) });
+      this.setState({
+        total: parseFloat((progress * finalTotal).toFixed(2)),
+      });
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
