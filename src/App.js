@@ -36,10 +36,11 @@ export default class App extends Component {
       inputValues: {},
       total: null,
       showForm: true,
-      currentDate: this.getNextHourDate(),
+      currentDate: null,
       errors: {},
       showModal: false,
       transitionClass: "",
+      calculationDetails: [],
     };
     this.stepRef = createRef();
   }
@@ -50,23 +51,31 @@ export default class App extends Component {
     return now;
   };
 
+  getLocalISODate = (date) => {
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return local.toISOString().split("T")[0];
+  };
+
+  getLocalTimeString = (date) => {
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   componentDidMount() {
     const nextHour = this.getNextHourDate();
+
+    // Store values using local copy of nextHour
+    const date = this.getLocalISODate(nextHour);
+    const time = this.getLocalTimeString(nextHour);
+
     this.setState({
       currentDate: nextHour,
       inputValues: {
-        4: `${nextHour.toISOString().split("T")[0]} ${nextHour
-          .toTimeString()
-          .slice(0, 5)}`,
+        4: `${date} ${time}`,
       },
     });
-    this.intervalId = setInterval(() => {
-      this.setState({ currentDate: new Date() });
-    }, 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.intervalId);
+    console.log(this.state.currentDate);
   }
 
   handleInputChange = (e) => {
@@ -100,7 +109,8 @@ export default class App extends Component {
       }
 
       const selected = new Date(`${dateStr}T${timeStr}`);
-      if (isNaN(selected.getTime()) || selected < new Date()) {
+      const now = new Date();
+      if (isNaN(selected.getTime()) || selected.getTime() < now.getTime()) {
         this.setState({
           errors: { ...errors, 4: "Delivery time cannot be in the past." },
           transitionClass: "shake",
@@ -175,20 +185,72 @@ export default class App extends Component {
     const [dateStr, timeStr] = (this.state.inputValues[4] || "").split(" ");
     const deliveryDate = new Date(`${dateStr}T${timeStr}`);
 
-    if (cartValue >= 100) return 0;
-    let total = cartValue < 10 ? 10 - cartValue : 0;
+    const details = [];
+    let total = 0;
+
+    if (cartValue >= 100) {
+      details.push("Free delivery because the cart value is €100 or more.");
+      this.setState({ calculationDetails: details });
+      return 0;
+    }
+
+    if (cartValue < 10) {
+      const surcharge = 10 - cartValue;
+      total += surcharge;
+      details.push(
+        `Small order surcharge: €${surcharge.toFixed(2)} (Cart value < €10)`
+      );
+    }
+
     total += 2;
-    if (distance > 1000) total += Math.ceil((distance - 1000) / 500);
-    if (items >= 5) total += (items - 4) * 0.5;
-    if (items > 12) total += 1.2;
-    if (
+    details.push("Base delivery fee: €2 for first 1000 meters.");
+
+    if (distance > 1000) {
+      const extraFee = Math.ceil((distance - 1000) / 500);
+      total += extraFee;
+      details.push(
+        `Extra distance fee: €${extraFee} (every extra 500m beyond 1km)`
+      );
+    }
+
+    if (items >= 5) {
+      const surcharge = (items - 4) * 0.5;
+      total += surcharge;
+      details.push(
+        `Item surcharge: €${surcharge.toFixed(2)} (for ${
+          items - 4
+        } extra items)`
+      );
+    }
+
+    if (items > 12) {
+      total += 1.2;
+      details.push("Bulk fee: €1.20 (more than 12 items)");
+    }
+
+    const isRushHour =
       deliveryDate.getUTCDay() === 5 &&
       deliveryDate.getUTCHours() >= 15 &&
-      deliveryDate.getUTCHours() < 19
-    ) {
+      deliveryDate.getUTCHours() < 19;
+
+    if (isRushHour) {
+      const beforeMultiplier = total;
       total *= 1.2;
+      const rushFee = total - beforeMultiplier;
+      details.push(
+        `Rush hour multiplier (1.2x): +€${rushFee.toFixed(
+          2
+        )} (Friday 3–7 PM UTC)`
+      );
     }
-    return Math.min(15, parseFloat(total.toFixed(2)));
+
+    if (total > 15) {
+      total = 15;
+      details.push("Delivery fee capped at €15.");
+    }
+
+    this.setState({ calculationDetails: details });
+    return parseFloat(total.toFixed(2));
   };
 
   formatDate = (date) =>
@@ -241,39 +303,48 @@ export default class App extends Component {
                 <div className={`${this.state.transitionClass}`}>
                   {currentStep === 4 ? (
                     <>
-                      <input
-                        type="date"
-                        className="form-control mb-2"
-                        min={currentDate.toISOString().split("T")[0]}
-                        defaultValue={currentDate.toISOString().split("T")[0]}
-                        onChange={(e) =>
-                          this.setState({
-                            inputValues: {
-                              ...inputValues,
-                              4: `${e.target.value} ${
-                                inputValues[4]?.split(" ")[1]
-                              }`,
-                            },
-                            errors: { ...errors, 4: "" },
-                          })
-                        }
-                      />
-                      <input
-                        type="time"
-                        className="form-control"
-                        min={currentDate.toTimeString().slice(0, 5)}
-                        onChange={(e) =>
-                          this.setState({
-                            inputValues: {
-                              ...inputValues,
-                              4: `${inputValues[4]?.split(" ")[0]} ${
-                                e.target.value
-                              }`,
-                            },
-                            errors: { ...errors, 4: "" },
-                          })
-                        }
-                      />
+                      {currentDate && (
+                        <input
+                          type="date"
+                          className="form-control mb-2"
+                          min={this.getLocalISODate(this.state.currentDate)}
+                          defaultValue={this.getLocalISODate(
+                            this.state.currentDate
+                          )}
+                          onChange={(e) =>
+                            this.setState({
+                              inputValues: {
+                                ...inputValues,
+                                4: `${e.target.value} ${
+                                  inputValues[4]?.split(" ")[1]
+                                }`,
+                              },
+                              errors: { ...errors, 4: "" },
+                            })
+                          }
+                        />
+                      )}
+                      {currentDate && (
+                        <input
+                          type="time"
+                          className="form-control"
+                          min={this.getLocalTimeString(this.state.currentDate)}
+                          defaultValue={this.getLocalTimeString(
+                            this.state.currentDate
+                          )}
+                          onChange={(e) =>
+                            this.setState({
+                              inputValues: {
+                                ...inputValues,
+                                4: `${inputValues[4]?.split(" ")[0]} ${
+                                  e.target.value
+                                }`,
+                              },
+                              errors: { ...errors, 4: "" },
+                            })
+                          }
+                        />
+                      )}
                     </>
                   ) : (
                     <Input
@@ -400,6 +471,17 @@ export default class App extends Component {
                 </span>{" "}
                 meters
               </p>
+
+              <hr className="my-3" />
+              <h5 className="text-h4 mb-2">How we calculated your fee:</h5>
+              <ul className="text-small">
+                {this.state.calculationDetails.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+
+              <hr className="my-3" />
+
               <button
                 className="btn mt-3"
                 style={{
@@ -456,8 +538,14 @@ export default class App extends Component {
         )}
 
         <button
-          className="btn btn-info position-fixed top-0 end-0 m-3"
+          className="btn position-fixed top-0 end-0 m-3"
           onClick={() => this.setState({ showModal: true })}
+          style={{
+            fontFamily: "Albert Sans",
+            background: "#1e91d6",
+            color: "#eff8e2",
+            padding: "5px 20px",
+          }}
         >
           How is it calculated?
         </button>
