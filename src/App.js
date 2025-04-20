@@ -309,19 +309,78 @@ export default class App extends Component {
               className="card p-4 justify-content-center text-center"
               style={{ border: "1px groove #1e91d6" }}
             >
-              <h3 className="text-success">
-                Your Total is €{total?.toFixed(2)}
+              <h3 className="text-h3">
+                Your Total is{" "}
+                <span
+                  className="text-h1"
+                  style={{
+                    fontWeight: "bold",
+                  }}
+                >
+                  €{total?.toFixed(2)}
+                </span>
               </h3>
               <p>
-                You have {inputValues[3]} items totaling €{inputValues[1]}.
+                You have{" "}
+                <span
+                  style={{
+                    color: "#9D44B5",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {inputValues[3]}
+                </span>{" "}
+                items totaling{" "}
+                <span
+                  style={{
+                    color: "#9D44B5",
+                    fontWeight: "bold",
+                  }}
+                >
+                  €{inputValues[1]}
+                </span>
+                .
               </p>
               <p>
-                Delivery at {inputValues[4]?.split(" ")[1]} on{" "}
-                {this.formatDate(new Date(inputValues[4]?.split(" ")[0]))}
+                Delivery at{" "}
+                <span
+                  style={{
+                    color: "#9D44B5",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {" "}
+                  {inputValues[4]?.split(" ")[1]}
+                </span>{" "}
+                on{" "}
+                <span
+                  style={{
+                    color: "#9D44B5",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {this.formatDate(new Date(inputValues[4]?.split(" ")[0]))}
+                </span>
               </p>
-              <p>Distance: {inputValues[2]} meters</p>
+              <p>
+                Distance:{" "}
+                <span
+                  style={{
+                    color: "#9D44B5",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {inputValues[2]}
+                </span>{" "}
+                meters
+              </p>
               <button
-                className="btn btn-success mt-3"
+                className="btn mt-3"
+                style={{
+                  backgroundColor: "#1e91d6",
+                  color: "#eff8e2",
+                  padding: "10px 70px",
+                }}
                 onClick={() => window.location.reload()}
               >
                 Start Again
