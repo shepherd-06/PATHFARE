@@ -185,110 +185,152 @@ export default class App extends Component {
     return (
       <div className="container py-5">
         <h1
-          className="text-display mb-4"
+          className="text-display mb-4 justify-content-center text-center"
           style={{ fontFamily: "Bona Nova SC" }}
         >
           PATHFARE
         </h1>
-        <p className="mb-4">
+        <p className="mb-4 justify-content-center text-center text-small">
           Unlock seamless shipping with Pathfare. Optimize your routes and
           packaging for cost-effective and timely deliveries.
         </p>
 
-        {showForm ? (
-          <div className="card p-4 border-primary border">
-            <div className="mb-3">
-              <h5>
-                Step {currentStep} / {steps.length}
-              </h5>
-            </div>
-            <div>
-              <label className="form-label">
-                {steps[currentStep - 1].label}
-              </label>
-              {currentStep === 4 ? (
-                <>
-                  <input
-                    type="date"
-                    className="form-control mb-2"
-                    min={currentDate.toISOString().split("T")[0]}
-                    defaultValue={currentDate.toISOString().split("T")[0]}
-                    onChange={(e) =>
-                      this.setState({
-                        inputValues: {
-                          ...inputValues,
-                          4: `${e.target.value} ${
-                            inputValues[4]?.split(" ")[1]
-                          }`,
-                        },
-                        errors: { ...errors, 4: "" },
-                      })
-                    }
+        <div className="col-md-3 mx-auto"></div>
+        <div className="col-md-6 mx-auto">
+          {showForm ? (
+            <div
+              className="card p-4 justify-content-center text-center"
+              style={{ border: "1px groove #1e91d6" }}
+            >
+              <div className="mb-3">
+                <p className="text-h4 mb-4">
+                  Step <span className="text-h1">{currentStep}</span> /{" "}
+                  {steps.length}
+                </p>
+              </div>
+              <div>
+                <label className="form-label mb-3">
+                  {steps[currentStep - 1].label}
+                </label>
+                {currentStep === 4 ? (
+                  <>
+                    <input
+                      type="date"
+                      className="form-control mb-2"
+                      min={currentDate.toISOString().split("T")[0]}
+                      defaultValue={currentDate.toISOString().split("T")[0]}
+                      onChange={(e) =>
+                        this.setState({
+                          inputValues: {
+                            ...inputValues,
+                            4: `${e.target.value} ${
+                              inputValues[4]?.split(" ")[1]
+                            }`,
+                          },
+                          errors: { ...errors, 4: "" },
+                        })
+                      }
+                    />
+                    <input
+                      type="time"
+                      className="form-control"
+                      min={currentDate.toTimeString().slice(0, 5)}
+                      onChange={(e) =>
+                        this.setState({
+                          inputValues: {
+                            ...inputValues,
+                            4: `${inputValues[4]?.split(" ")[0]} ${
+                              e.target.value
+                            }`,
+                          },
+                          errors: { ...errors, 4: "" },
+                        })
+                      }
+                    />
+                  </>
+                ) : (
+                  <Input
+                    type={steps[currentStep - 1].type}
+                    placeholder={steps[currentStep - 1].placeholder}
+                    className="form-control justify-content-center text-center"
+                    onChange={this.handleInputChange}
+                    value={inputValues[currentStep] || ""}
                   />
-                  <input
-                    type="time"
-                    className="form-control"
-                    min={currentDate.toTimeString().slice(0, 5)}
-                    onChange={(e) =>
-                      this.setState({
-                        inputValues: {
-                          ...inputValues,
-                          4: `${inputValues[4]?.split(" ")[0]} ${
-                            e.target.value
-                          }`,
-                        },
-                        errors: { ...errors, 4: "" },
-                      })
-                    }
-                  />
-                </>
-              ) : (
-                <Input
-                  type={steps[currentStep - 1].type}
-                  placeholder={steps[currentStep - 1].placeholder}
-                  className="form-control"
-                  onChange={this.handleInputChange}
-                  value={inputValues[currentStep] || ""}
-                />
-              )}
-              {errors[currentStep] && (
-                <div className="text-danger mt-1">{errors[currentStep]}</div>
-              )}
-            </div>
+                )}
+                {errors[currentStep] && (
+                  <div
+                    className="text-danger mt-1"
+                    style={{
+                      color: "#ED2A1D",
+                    }}
+                  >
+                    {errors[currentStep]}
+                  </div>
+                )}
+              </div>
 
-            <div className="d-flex justify-content-between mt-4">
-              {currentStep > 1 && (
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={this.handlePrevious}
-                >
-                  Previous
-                </button>
-              )}
-              <button className="btn btn-primary" onClick={this.handleNext}>
-                {currentStep === steps.length ? "Calculate" : "Next"}
+              <div className="row mt-4">
+                <div className="col-4">
+                  {currentStep > 1 && (
+                    <button
+                      className="btn"
+                      style={{
+                        backgroundColor: "transparent",
+                        color: "#003b36",
+                        padding: "10px 70px",
+                        border: "1px solid #1e91d6",
+                      }}
+                      onClick={this.handlePrevious}
+                    >
+                      Previous
+                    </button>
+                  )}
+                </div>
+
+                <div className="col-4"></div>
+
+                <div className="col-4">
+                  <button
+                    className="btn"
+                    style={{
+                      backgroundColor: "#1e91d6",
+                      color: "#eff8e2",
+                      padding: "10px 70px",
+                    }}
+                    onClick={this.handleNext}
+                  >
+                    {currentStep === steps.length ? "Calculate" : "Next"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="card p-4 justify-content-center text-center"
+              style={{ border: "1px groove #1e91d6" }}
+            >
+              <h3 className="text-success">
+                Your Total is €{total?.toFixed(2)}
+              </h3>
+              <p>
+                You have {inputValues[3]} items totaling €{inputValues[1]}.
+              </p>
+              <p>
+                Delivery at {inputValues[4]?.split(" ")[1]} on{" "}
+                {this.formatDate(new Date(inputValues[4]?.split(" ")[0]))}
+              </p>
+              <p>Distance: {inputValues[2]} meters</p>
+              <button
+                className="btn btn-success mt-3"
+                onClick={() => window.location.reload()}
+              >
+                Start Again
               </button>
             </div>
-          </div>
-        ) : (
-          <div className="card p-4 border-primary border">
-            <h3 className="text-success">Your Total is €{total?.toFixed(2)}</h3>
-            <p>
-              You have {inputValues[3]} items totaling €{inputValues[1]}.
-            </p>
-            <p>
-              Delivery at {inputValues[4]?.split(" ")[1]} on{" "}
-              {this.formatDate(new Date(inputValues[4]?.split(" ")[0]))}
-            </p>
-            <p>Distance: {inputValues[2]} meters</p>
-            <button
-              className="btn btn-success mt-3"
-              onClick={() => window.location.reload()}
-            >
-              Start Again
-            </button>
-          </div>
-        )}
+          )}
+        </div>
+
+        <div className="col-md-3 mx-auto"> </div>
 
         {showModal && (
           <div className="modal d-block" tabIndex="-1">
@@ -334,10 +376,11 @@ export default class App extends Component {
         >
           How is it calculated?
         </button>
-
-        <footer className="text-center mt-5 text-muted">
-          This app is 99% made with Gemini in Firebase Studio and finalized by
-          ChatGPT (GPT-4o).
+        <footer className="text-center mt-5 text-muted text-small">
+          Originally built with Gemini in Firebase Studio and finalized by
+          ChatGPT (GPT-4o). <br /> This app was later refined and migrated to
+          React by me—after approximately 3 hours of debugging and deployment to
+          Firebase.
         </footer>
       </div>
     );
