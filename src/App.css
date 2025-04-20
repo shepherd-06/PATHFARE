@@ -1,0 +1,82 @@
+/* Basic Reset */
+* {
+  box-sizing: border-box;
+  border-color: #e3e3e3; /* was --border */
+}
+
+body {
+  font-family: "Albert Sans", sans-serif;
+  color: #003b36;
+  background-color: #eff8e2;
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography */
+.text-display {
+  font-size: 56px;
+  font-family: "Bona Nova SC", serif;
+  color: #1e91d6;
+}
+
+.text-h1 {
+  font-size: 40px;
+  font-family: "Bona Nova SC", serif;
+  color: #1e91d6;
+}
+
+.text-h2 {
+  font-size: 32px;
+  font-family: "Albert Sans", sans-serif;
+}
+
+.text-h3 {
+  font-size: 24px;
+  font-family: "Albert Sans", sans-serif;
+}
+
+.text-h4 {
+  font-size: 20px;
+  font-family: "Albert Sans", sans-serif;
+}
+
+.text-body {
+  font-size: 16px;
+  font-family: "Albert Sans", sans-serif;
+}
+
+.text-small {
+  font-size: 14px;
+  font-family: "Albert Sans", sans-serif;
+}
+
+/* Animation */
+.slide-in-right {
+  animation: slideInRight 0.5s forwards;
+}
+
+.slide-out-left {
+  animation: slideOutLeft 0.5s forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
