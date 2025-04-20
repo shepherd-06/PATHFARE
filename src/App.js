@@ -39,6 +39,7 @@ export default class App extends Component {
       currentDate: this.getNextHourDate(),
       errors: {},
       showModal: false,
+      transitionClass: "",
     };
     this.stepRef = createRef();
   }
@@ -84,37 +85,57 @@ export default class App extends Component {
 
   validateStep = () => {
     const { currentStep, inputValues, errors } = this.state;
+
+    // Step 4: Validate date and time
     if (currentStep === 4) {
       const [dateStr, timeStr] = (inputValues[4] || "").split(" ");
+
       if (!dateStr || !timeStr) {
         this.setState({
           errors: { ...errors, 4: "Please select both date and time." },
+          transitionClass: "shake",
         });
+        setTimeout(() => this.setState({ transitionClass: "" }), 400);
         return false;
       }
+
       const selected = new Date(`${dateStr}T${timeStr}`);
       if (isNaN(selected.getTime()) || selected < new Date()) {
         this.setState({
           errors: { ...errors, 4: "Delivery time cannot be in the past." },
+          transitionClass: "shake",
         });
+        setTimeout(() => this.setState({ transitionClass: "" }), 400);
         return false;
       }
+
       return true;
     }
+
+    // Steps 1–3: Validate non-empty input
     if (!inputValues[currentStep] || inputValues[currentStep].trim() === "") {
       this.setState({
         errors: { ...errors, [currentStep]: "This field is required." },
+        transitionClass: "shake",
       });
+      setTimeout(() => this.setState({ transitionClass: "" }), 400);
       return false;
     }
+
     return true;
   };
 
   handleNext = () => {
     if (!this.validateStep()) return;
+
     const { currentStep } = this.state;
     if (currentStep < steps.length) {
-      this.setState({ currentStep: currentStep + 1 });
+      this.setState({
+        transitionClass: "slide-in-right",
+        currentStep: currentStep + 1,
+      });
+
+      setTimeout(() => this.setState({ transitionClass: "" }), 400); // Reset
     } else {
       const calculatedTotal = this.calculateDeliveryFee();
       this.setState({ showForm: false }, () =>
@@ -126,7 +147,12 @@ export default class App extends Component {
   handlePrevious = () => {
     const { currentStep } = this.state;
     if (currentStep > 1) {
-      this.setState({ currentStep: currentStep - 1 });
+      this.setState({
+        transitionClass: "slide-out-left",
+        currentStep: currentStep - 1,
+      });
+
+      setTimeout(() => this.setState({ transitionClass: "" }), 400); // Reset
     }
   };
 
@@ -208,77 +234,79 @@ export default class App extends Component {
                   {steps.length}
                 </p>
               </div>
-              <div>
+              <div className={`mb-3`}>
                 <label className="form-label mb-3">
                   {steps[currentStep - 1].label}
                 </label>
-                {currentStep === 4 ? (
-                  <>
-                    <input
-                      type="date"
-                      className="form-control mb-2"
-                      min={currentDate.toISOString().split("T")[0]}
-                      defaultValue={currentDate.toISOString().split("T")[0]}
-                      onChange={(e) =>
-                        this.setState({
-                          inputValues: {
-                            ...inputValues,
-                            4: `${e.target.value} ${
-                              inputValues[4]?.split(" ")[1]
-                            }`,
-                          },
-                          errors: { ...errors, 4: "" },
-                        })
-                      }
+                <div className={`${this.state.transitionClass}`}>
+                  {currentStep === 4 ? (
+                    <>
+                      <input
+                        type="date"
+                        className="form-control mb-2"
+                        min={currentDate.toISOString().split("T")[0]}
+                        defaultValue={currentDate.toISOString().split("T")[0]}
+                        onChange={(e) =>
+                          this.setState({
+                            inputValues: {
+                              ...inputValues,
+                              4: `${e.target.value} ${
+                                inputValues[4]?.split(" ")[1]
+                              }`,
+                            },
+                            errors: { ...errors, 4: "" },
+                          })
+                        }
+                      />
+                      <input
+                        type="time"
+                        className="form-control"
+                        min={currentDate.toTimeString().slice(0, 5)}
+                        onChange={(e) =>
+                          this.setState({
+                            inputValues: {
+                              ...inputValues,
+                              4: `${inputValues[4]?.split(" ")[0]} ${
+                                e.target.value
+                              }`,
+                            },
+                            errors: { ...errors, 4: "" },
+                          })
+                        }
+                      />
+                    </>
+                  ) : (
+                    <Input
+                      type={steps[currentStep - 1].type}
+                      placeholder={steps[currentStep - 1].placeholder}
+                      className="form-control justify-content-center text-center"
+                      onChange={this.handleInputChange}
+                      value={inputValues[currentStep] || ""}
                     />
-                    <input
-                      type="time"
-                      className="form-control"
-                      min={currentDate.toTimeString().slice(0, 5)}
-                      onChange={(e) =>
-                        this.setState({
-                          inputValues: {
-                            ...inputValues,
-                            4: `${inputValues[4]?.split(" ")[0]} ${
-                              e.target.value
-                            }`,
-                          },
-                          errors: { ...errors, 4: "" },
-                        })
-                      }
-                    />
-                  </>
-                ) : (
-                  <Input
-                    type={steps[currentStep - 1].type}
-                    placeholder={steps[currentStep - 1].placeholder}
-                    className="form-control justify-content-center text-center"
-                    onChange={this.handleInputChange}
-                    value={inputValues[currentStep] || ""}
-                  />
-                )}
-                {errors[currentStep] && (
-                  <div
-                    className="text-danger mt-1"
-                    style={{
-                      color: "#ED2A1D",
-                    }}
-                  >
-                    {errors[currentStep]}
-                  </div>
-                )}
+                  )}
+                  {errors[currentStep] && (
+                    <div
+                      className="text-danger mt-1"
+                      style={{
+                        color: "#ED2A1D",
+                      }}
+                    >
+                      {errors[currentStep]}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="row mt-4">
-                <div className="col-4">
+              <div className="row mt-4 px-3">
+                <div className="col-6 pe-1">
                   {currentStep > 1 && (
                     <button
-                      className="btn"
+                      className="btn w-100"
                       style={{
                         backgroundColor: "transparent",
                         color: "#003b36",
-                        padding: "10px 70px",
                         border: "1px solid #1e91d6",
+                        padding: "10px 0",
                       }}
                       onClick={this.handlePrevious}
                     >
@@ -287,15 +315,13 @@ export default class App extends Component {
                   )}
                 </div>
 
-                <div className="col-4"></div>
-
-                <div className="col-4">
+                <div className="col-6 ps-1">
                   <button
-                    className="btn"
+                    className="btn w-100"
                     style={{
                       backgroundColor: "#1e91d6",
                       color: "#eff8e2",
-                      padding: "10px 70px",
+                      padding: "10px 0",
                     }}
                     onClick={this.handleNext}
                   >
