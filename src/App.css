@@ -51,11 +51,11 @@ body {
 }
 
 .slide-in-right {
-  animation: slideInRight 0.4s ease forwards;
+  animation: slideInRight 1s ease forwards;
 }
 
 .slide-out-left {
-  animation: slideOutLeft 0.4s ease forwards;
+  animation: slideOutLeft 1s ease forwards;
 }
 
 @keyframes slideInRight {
